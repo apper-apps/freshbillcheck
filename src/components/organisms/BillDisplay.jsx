@@ -41,12 +41,18 @@ const BillDisplay = ({ billData, onPrint, onDownload, onNewSearch, onViewHistory
       {/* Header Card */}
       <Card className="p-8 text-center">
         <div className="space-y-6">
-          <div className="flex justify-between items-start">
+<div className="flex justify-between items-start">
             <div className="text-left">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Electricity Bill
               </h2>
-              <p className="text-gray-600">Consumer ID: {consumerId}</p>
+              <div className="space-y-1">
+                <p className="text-gray-600">Consumer ID: {consumerId}</p>
+                <div className="flex items-center gap-2">
+                  <ApperIcon name="CheckCircle" size={14} className="text-success" />
+                  <span className="text-xs text-success font-medium">Verified Account</span>
+                </div>
+              </div>
             </div>
             <StatusBadge status={status} />
           </div>

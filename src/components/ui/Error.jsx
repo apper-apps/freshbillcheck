@@ -30,10 +30,13 @@ const Error = ({
         <div className="space-y-4">
           <div>
 <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Oops! Something went wrong
+              {message.includes("not found") ? "Bill Not Found" : "Oops! Something went wrong"}
             </h3>
             <p className="text-gray-600 font-medium">
-              {message}
+              {message.includes("not found") 
+                ? "We couldn't locate a bill with the provided Consumer ID." 
+                : message
+              }
             </p>
           </div>
           
@@ -42,9 +45,18 @@ const Error = ({
               <ApperIcon name="Info" size={16} className="text-error mt-0.5 flex-shrink-0" />
               <div className="text-sm text-error font-medium text-left">
                 {suggestion.includes('\n') ? (
-                  <div className="space-y-1">
-                    {suggestion.split('\n').map((line, index) => (
-                      <div key={index}>{line}</div>
+                  <div className="space-y-2">
+                    {suggestion.split('\n').filter(line => line.trim()).map((line, index) => (
+                      <div key={index} className="flex items-start gap-1">
+                        {line.startsWith('•') ? (
+                          <>
+                            <span className="text-error">•</span>
+                            <span>{line.substring(1).trim()}</span>
+                          </>
+                        ) : (
+                          <span className="font-semibold">{line}</span>
+                        )}
+                      </div>
                     ))}
                   </div>
                 ) : (
@@ -53,6 +65,22 @@ const Error = ({
               </div>
             </div>
           </div>
+          
+          {message.includes("not found") && (
+            <div className="bg-amber/5 border border-amber/20 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <ApperIcon name="Lightbulb" size={16} className="text-amber mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-amber font-medium text-left">
+                  <p className="font-semibold mb-1">Common Consumer ID formats:</p>
+                  <div className="space-y-1 text-xs">
+                    <div>• 10 digits: 1234567890</div>
+                    <div>• 11 digits: 12345678901</div>
+                    <div>• 12 digits: 123456789012</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             {onRetry && (

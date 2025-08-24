@@ -22,7 +22,7 @@ const searchBill = useCallback(async (consumerId) => {
     setError("")
     setBillData(null)
     
-    try {
+try {
       const bill = await billService.getBillByConsumerId(consumerId)
       setBillData(bill)
       toast.success("Bill found successfully!", {
@@ -32,17 +32,34 @@ const searchBill = useCallback(async (consumerId) => {
     } catch (err) {
       let errorMessage = err.message || "Failed to fetch bill information"
       
-      // Provide more specific error messages
+      // Provide more specific and helpful error messages
       if (errorMessage.includes("Bill not found")) {
-        errorMessage = "Bill not found for consumer ID " + consumerId + ". Please verify your consumer ID and try again."
+        errorMessage = `No bill found for Consumer ID: ${consumerId}
+
+Please check:
+• Consumer ID should be 10-12 digits
+• Remove spaces, dashes, or special characters
+• Verify ID from your latest electricity bill
+• Try entering without any formatting
+
+If you have multiple connections, try a different Consumer ID.`
       } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
-        errorMessage = "Unable to connect to the service. Please check your internet connection and try again."
+        errorMessage = "Connection failed. Please check your internet connection and try again."
+      } else if (errorMessage.includes("Invalid format")) {
+        errorMessage = `Invalid Consumer ID format: ${consumerId}
+
+Required format:
+• Must be 10-12 digits only
+• No letters or special characters
+• Examples: 1234567890, 123456789012`
+      } else if (errorMessage.includes("timeout")) {
+        errorMessage = "Search timed out. Please try again or check your connection."
       }
       
       setError(errorMessage)
-      toast.error("Bill not found", {
+      toast.error("Search failed", {
         position: "top-right",
-        autoClose: 4000
+        autoClose: 5000
       })
     } finally {
       setLoading(false)

@@ -65,15 +65,32 @@ const renderContent = () => {
       return <Loading message="Checking your bill..." />
     }
     
-    if (error) {
+if (error) {
       let suggestion = "Please try again or contact support if the problem persists."
       
-      if (error.includes("not found") || error.includes("Bill not found")) {
-        suggestion = "Double-check your consumer ID format:\n• Must be 10-12 digits only\n• Remove any spaces or special characters\n• Try a different consumer ID if you have multiple connections"
-      } else if (error.includes("network") || error.includes("connection") || error.includes("internet")) {
-        suggestion = "Please check your internet connection and try again."
-      } else if (error.includes("required")) {
-        suggestion = "Please enter your consumer ID to search for your bill."
+      if (error.includes("not found") || error.includes("Bill not found") || error.includes("No bill found")) {
+        suggestion = `Verify your Consumer ID format:
+• Must be exactly 10-12 digits
+• Remove all spaces, dashes, and special characters  
+• Check your latest electricity bill for the correct ID
+• Try different formatting if you have the ID written differently
+• Contact your electricity provider if the ID is correct
+
+Example formats: 1234567890, 123456789012`
+      } else if (error.includes("Invalid format") || error.includes("Invalid Consumer ID")) {
+        suggestion = `Consumer ID Format Requirements:
+• Only numbers allowed (0-9)
+• Must be 10-12 digits long
+• No letters, spaces, or special characters
+• Examples: 1234567890, 123456789012
+
+Please correct the format and try again.`
+      } else if (error.includes("network") || error.includes("connection") || error.includes("Connection failed")) {
+        suggestion = "Network connection issue. Please:\n• Check your internet connection\n• Try refreshing the page\n• Wait a moment and try again"
+      } else if (error.includes("required") || error.includes("Consumer ID is required")) {
+        suggestion = "Please enter your Consumer ID to search for your electricity bill."
+      } else if (error.includes("timeout")) {
+        suggestion = "The search is taking too long. Please:\n• Check your internet connection\n• Try again in a few moments\n• Refresh the page if the problem persists"
       }
       
       return (

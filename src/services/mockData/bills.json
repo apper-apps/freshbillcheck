@@ -128,5 +128,70 @@
     "taxes": 267.54,
     "surcharges": 133.77,
     "totalAmount": 3076.71
+  },
+  {
+    "Id": 11,
+    "consumerId": "123-456-7890",
+    "billAmount": 1890.50,
+    "dueDate": "2024-02-16",
+    "status": "unpaid",
+    "billMonth": "January 2024",
+    "unitsConsumed": 189,
+    "meterReading": 9876,
+    "taxes": 189.05,
+    "surcharges": 94.53,
+    "totalAmount": 2174.08
+  },
+  {
+    "Id": 12,
+    "consumerId": "987 654 3210",
+    "billAmount": 3456.75,
+    "dueDate": "2024-02-11",
+    "status": "paid",
+    "billMonth": "January 2024",
+    "unitsConsumed": 345,
+    "meterReading": 18765,
+    "taxes": 345.68,
+    "surcharges": 172.84,
+    "totalAmount": 3975.27
+  },
+  {
+    "Id": 13,
+    "consumerId": "111122223333",
+    "billAmount": 2234.25,
+    "dueDate": "2024-02-13",
+    "status": "unpaid",
+    "billMonth": "January 2024",
+    "unitsConsumed": 223,
+    "meterReading": 13456,
+    "taxes": 223.43,
+    "surcharges": 111.71,
+    "totalAmount": 2569.39
+  },
+  {
+    "Id": 14,
+    "consumerId": "555_666_7777",
+    "billAmount": 1678.90,
+    "dueDate": "2024-01-28",
+    "status": "overdue",
+    "billMonth": "December 2023",
+    "unitsConsumed": 167,
+    "meterReading": 8765,
+    "taxes": 167.89,
+    "surcharges": 83.95,
+    "totalAmount": 1930.74
+  },
+  {
+    "Id": 15,
+    "consumerId": "888.999.0000",
+    "billAmount": 4567.80,
+    "dueDate": "2024-02-09",
+    "status": "paid",
+    "billMonth": "January 2024",
+    "unitsConsumed": 456,
+    "meterReading": 25430,
+    "taxes": 456.78,
+    "surcharges": 228.39,
+    "totalAmount": 5252.97
   }
 ]

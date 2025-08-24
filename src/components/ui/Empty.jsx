@@ -37,19 +37,39 @@ const Empty = ({
             </p>
           </div>
           
-          <div className="bg-amber/10 border border-amber/20 rounded-xl p-4">
+<div className="bg-amber/10 border border-amber/20 rounded-xl p-4">
             <div className="flex items-start gap-3">
               <ApperIcon name="Lightbulb" size={16} className="text-amber mt-0.5 flex-shrink-0" />
-              <div className="text-left space-y-2">
-                <p className="text-sm text-amber font-medium">
-                  Tips for finding your bill:
+              <div className="text-left space-y-3">
+                <p className="text-sm text-amber font-semibold">
+                  Troubleshooting Tips:
                 </p>
-                <ul className="text-xs text-amber space-y-1">
-                  <li>• Check your consumer ID is 10-12 digits</li>
-                  <li>• Remove any spaces or special characters</li>
-                  <li>• Verify the ID from your last bill</li>
-                  <li>• Contact your electricity provider if needed</li>
-                </ul>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs text-amber font-medium mb-1">✓ Check Consumer ID Format:</p>
+                    <ul className="text-xs text-amber/80 space-y-0.5 ml-3">
+                      <li>• Must be exactly 10-12 digits</li>
+                      <li>• Remove all spaces and dashes</li>
+                      <li>• No letters or special characters</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs text-amber font-medium mb-1">✓ Where to Find Your ID:</p>
+                    <ul className="text-xs text-amber/80 space-y-0.5 ml-3">
+                      <li>• Top-right corner of your electricity bill</li>
+                      <li>• Previous month's bill statement</li>
+                      <li>• Electricity board connection documents</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs text-amber font-medium mb-1">✓ Still Not Working?</p>
+                    <ul className="text-xs text-amber/80 space-y-0.5 ml-3">
+                      <li>• Double-check for typos</li>
+                      <li>• Try a different connection if you have multiple</li>
+                      <li>• Contact your electricity provider</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -10,14 +10,22 @@ const BillSearchForm = ({ onSearch, loading = false }) => {
   const [consumerId, setConsumerId] = useState("")
   const [error, setError] = useState("")
   
-  const handleInputChange = (e) => {
+const handleInputChange = (e) => {
     const value = e.target.value
     const cleaned = cleanConsumerId(value)
     
-    // Limit to 12 digits
+    // Limit to 12 digits and provide real-time validation
     if (cleaned.length <= 12) {
       setConsumerId(formatConsumerId(cleaned))
-      setError("")
+      
+      // Real-time validation feedback
+      if (cleaned.length > 0 && cleaned.length < 10) {
+        setError("Consumer ID should be at least 10 digits")
+      } else if (cleaned.length > 12) {
+        setError("Consumer ID cannot exceed 12 digits")
+      } else {
+        setError("")
+      }
     }
   }
   
@@ -26,12 +34,24 @@ const BillSearchForm = ({ onSearch, loading = false }) => {
     const cleaned = cleanConsumerId(consumerId)
     
     if (!cleaned) {
-      setError("Please enter your consumer ID")
+      setError("Please enter your consumer ID to search")
+      toast.error("Consumer ID is required", { 
+        position: "top-right", 
+        autoClose: 3000 
+      })
       return
     }
     
     if (!validateConsumerId(cleaned)) {
-      setError("Consumer ID must be 10-12 digits")
+      const errorMsg = cleaned.length < 10 
+        ? `Consumer ID too short (${cleaned.length} digits). Please enter 10-12 digits.`
+        : `Consumer ID too long (${cleaned.length} digits). Please enter 10-12 digits.`
+      
+      setError(errorMsg)
+      toast.error("Invalid Consumer ID format", { 
+        position: "top-right", 
+        autoClose: 3000 
+      })
       return
     }
     

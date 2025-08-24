@@ -1,8 +1,37 @@
-import billsData from "@/services/mockData/bills.json"
+import billsData from "@/services/mockData/bills.json";
 
 const DELAY_MS = 300
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+// Helper function to calculate Levenshtein distance for fuzzy matching
+const levenshteinDistance = (str1, str2) => {
+  const matrix = [];
+  
+  for (let i = 0; i <= str2.length; i++) {
+    matrix[i] = [i];
+  }
+  
+  for (let j = 0; j <= str1.length; j++) {
+    matrix[0][j] = j;
+  }
+  
+  for (let i = 1; i <= str2.length; i++) {
+    for (let j = 1; j <= str1.length; j++) {
+      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+  
+  return matrix[str2.length][str1.length];
+}
 
 class BillService {
   async getBillByConsumerId(consumerId) {
@@ -11,9 +40,34 @@ class BillService {
     // Clean and validate the consumer ID
     const cleanId = consumerId.toString().replace(/\D/g, '')
     
-    const bill = billsData.find(bill => 
-      bill.consumerId === cleanId || bill.consumerId === consumerId.toString()
-    )
+// Normalize the input consumer ID
+    const normalizedInput = cleanId.replace(/[\s\-_]/g, '')
+    
+    // Try exact match first
+    let bill = billsData.find(bill => {
+      const normalizedBill = bill.consumerId.replace(/[\s\-_]/g, '')
+      return normalizedBill === normalizedInput || 
+             normalizedBill === consumerId.toString().replace(/[\s\-_]/g, '')
+    })
+    
+    // If no exact match, try partial matches (for typos or incomplete IDs)
+    if (!bill) {
+      bill = billsData.find(bill => {
+        const normalizedBill = bill.consumerId.replace(/[\s\-_]/g, '')
+        // Check if the input is contained within the bill ID (for partial matches)
+        return normalizedBill.includes(normalizedInput) || 
+               normalizedInput.includes(normalizedBill)
+      })
+    }
+    
+    // If still no match, try fuzzy matching (allow 1-2 character differences)
+    if (!bill) {
+      bill = billsData.find(bill => {
+        const normalizedBill = bill.consumerId.replace(/[\s\-_]/g, '')
+        return levenshteinDistance(normalizedBill, normalizedInput) <= 2 &&
+               Math.abs(normalizedBill.length - normalizedInput.length) <= 1
+      })
+    }
     
     if (!bill) {
       throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's 10-12 digits without spaces.")
