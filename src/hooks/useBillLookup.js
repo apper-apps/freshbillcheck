@@ -41,15 +41,15 @@ const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"
       let errorMessage = err.message || "Failed to fetch bill information"
       
       // Provide more specific and helpful error messages
-      if (errorMessage.includes("Bill not found")) {
+if (errorMessage.includes("Bill not found")) {
         if (searchType === "consumer") {
           errorMessage = `No bill found for Consumer ID: ${searchValue}
 
-Please check:
-• Consumer ID should be exactly 10, 11, or 12 digits
-• Remove spaces, dashes, or special characters  
-• Verify ID from your latest electricity bill
-• Try entering without any formatting
+Please verify:
+• Consumer ID must be exactly 10-12 digits long
+• Remove all spaces, dashes, or special characters  
+• Check your latest electricity bill for the correct ID
+• Try entering the ID without any formatting
 
 If you have multiple connections, try a different Consumer ID.`
         } else if (searchType === "reference") {
@@ -64,12 +64,12 @@ Please check:
       } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
         errorMessage = "Connection failed. Please check your internet connection and try again."
       } else if (errorMessage.includes("Invalid format")) {
-        if (searchType === "consumer") {
+if (searchType === "consumer") {
           errorMessage = `Invalid Consumer ID format: ${searchValue}
 
 Required format:
-• Must be exactly 10, 11, or 12 digits only
-• No letters or special characters
+• Must be exactly 10-12 digits only (no letters or symbols)
+• No spaces, dashes, or special characters
 • Examples: 1234567890, 12345678901, 123456789012`
         } else if (searchType === "reference") {
           errorMessage = `Invalid Reference Number format: ${searchValue}

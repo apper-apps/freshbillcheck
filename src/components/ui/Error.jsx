@@ -66,12 +66,12 @@ const Error = ({
             </div>
           </div>
           
-          {message.includes("not found") && (
+{message.includes("not found") && (
             <div className="bg-amber/5 border border-amber/20 rounded-xl p-4">
               <div className="flex items-start gap-3">
                 <ApperIcon name="Lightbulb" size={16} className="text-amber mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-amber font-medium text-left">
-                  <p className="font-semibold mb-1">Common Consumer ID formats:</p>
+                  <p className="font-semibold mb-1">Accepted Consumer ID formats:</p>
                   <div className="space-y-1 text-xs">
                     <div>• 10 digits: 1234567890</div>
                     <div>• 11 digits: 12345678901</div>

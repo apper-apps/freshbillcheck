@@ -12,7 +12,7 @@ const [searchType, setSearchType] = useState("consumer") // consumer, reference
   const [referenceNumber, setReferenceNumber] = useState("")
   const [error, setError] = useState("")
 
-  const handleConsumerIdChange = (e) => {
+const handleConsumerIdChange = (e) => {
     const value = e.target.value
     const cleaned = cleanConsumerId(value)
     
@@ -20,11 +20,9 @@ const [searchType, setSearchType] = useState("consumer") // consumer, reference
     if (cleaned.length <= 12) {
       setConsumerId(formatConsumerId(cleaned))
       
-      // Real-time validation feedback for 10-digit support
+      // Real-time validation feedback - accept 10, 11, or 12 digits
       if (cleaned.length > 0 && cleaned.length < 10) {
         setError("Consumer ID should be at least 10 digits")
-      } else if (cleaned.length > 12) {
-        setError("Consumer ID cannot exceed 12 digits")
       } else {
         setError("")
       }
@@ -66,10 +64,9 @@ const [searchType, setSearchType] = useState("consumer") // consumer, reference
       }
       
       if (!validateConsumerId(cleaned)) {
-        const errorMsg = cleaned.length < 10 
-          ? `Consumer ID too short (${cleaned.length} digits). Please enter exactly 10, 11, or 12 digits.`
-          : `Consumer ID too long (${cleaned.length} digits). Please enter exactly 10, 11, or 12 digits.`
-        
+const errorMsg = cleaned.length < 10 
+          ? `Consumer ID too short (${cleaned.length} digits). Please enter exactly 10-12 digits.`
+          : `Consumer ID too long (${cleaned.length} digits). Please enter exactly 10-12 digits.`
         setError(errorMsg)
         toast.error("Invalid Consumer ID format", { 
           position: "top-right", 
@@ -160,9 +157,9 @@ const [searchType, setSearchType] = useState("consumer") // consumer, reference
         
         {/* Consumer ID Form */}
         {searchType === "consumer" && (
-          <FormField
+<FormField
             label="Consumer ID"
-            placeholder="Enter 10-12 digit consumer ID"
+            placeholder="Enter your 10-12 digit consumer ID"
             value={consumerId}
             onChange={handleConsumerIdChange}
             error={error}

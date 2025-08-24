@@ -69,21 +69,21 @@ const renderContent = () => {
 if (error) {
       let suggestion = "Please try again or contact support if the problem persists."
       
-      if (error.includes("not found") || error.includes("Bill not found") || error.includes("No bill found")) {
-        suggestion = `Verify your Consumer ID format:
-• Must be exactly 10-12 digits
+if (error.includes("not found") || error.includes("Bill not found") || error.includes("No bill found")) {
+        suggestion = `Verify your Consumer ID:
+• Must be exactly 10-12 digits long
 • Remove all spaces, dashes, and special characters  
 • Check your latest electricity bill for the correct ID
-• Try different formatting if you have the ID written differently
-• Contact your electricity provider if the ID is correct
+• Try entering the ID exactly as shown on your bill
+• Contact your electricity provider if you're certain the ID is correct
 
-Example formats: 1234567890, 123456789012`
+Valid examples: 1234567890, 12345678901, 123456789012`
       } else if (error.includes("Invalid format") || error.includes("Invalid Consumer ID")) {
-        suggestion = `Consumer ID Format Requirements:
+suggestion = `Consumer ID Format Requirements:
 • Only numbers allowed (0-9)
-• Must be 10-12 digits long
-• No letters, spaces, or special characters
-• Examples: 1234567890, 123456789012
+• Must be exactly 10-12 digits long
+• No letters, spaces, dashes, or special characters
+• Valid examples: 1234567890, 12345678901, 123456789012
 
 Please correct the format and try again.`
       } else if (error.includes("network") || error.includes("connection") || error.includes("Connection failed")) {

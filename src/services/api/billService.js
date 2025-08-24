@@ -70,7 +70,7 @@ async getBillByConsumerId(consumerId) {
     }
     
     if (!bill) {
-      throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's exactly 10, 11, or 12 digits without spaces.")
+throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's exactly 10-12 digits without spaces.")
     }
     
     return { ...bill }
@@ -214,10 +214,10 @@ async getBillHistory(searchValue, months = 12, searchType = "consumer") {
     const cleaned = consumerId.replace(/\s/g, "")
     
     // Support exactly 10, 11, or 12 digits
-    if (!/^(\d{10}|\d{11}|\d{12})$/.test(cleaned)) {
+if (!/^(\d{10}|\d{11}|\d{12})$/.test(cleaned)) {
       return { 
         valid: false, 
-        message: "Consumer ID must be exactly 10, 11, or 12 digits" 
+        message: "Consumer ID must be exactly 10-12 digits" 
       }
     }
     
