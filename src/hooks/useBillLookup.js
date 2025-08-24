@@ -99,8 +99,8 @@ Required format:
     setLoading(false)
   }, [])
   
-  const retrySearch = useCallback((consumerId) => {
-    searchBill(consumerId)
+const retrySearch = useCallback((searchValue, searchType = "consumer") => {
+    searchBill(searchValue, searchType)
   }, [searchBill])
   
 const fetchBillHistory = useCallback(async (searchValue, searchType = "consumer", months = 12) => {

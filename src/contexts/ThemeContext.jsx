@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from "react";
+import Error from "@/components/ui/Error";
 
 const ThemeContext = createContext()
 
@@ -11,44 +12,72 @@ export const useTheme = () => {
 }
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    // Check localStorage first
-    const savedTheme = localStorage.getItem('billcheck-theme')
-    if (savedTheme) return savedTheme
+const [theme, setTheme] = useState(() => {
+    let initialTheme = 'light'
     
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark'
+    try {
+      // Check localStorage first
+      const savedTheme = localStorage.getItem('billcheck-theme')
+      if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+        initialTheme = savedTheme
+      } else {
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          initialTheme = 'dark'
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to read theme preference:', error)
     }
     
-    return 'light'
-  })
-
-  useEffect(() => {
-    // Save to localStorage
-    localStorage.setItem('billcheck-theme', theme)
-    
-    // Apply theme class to document
+    // Apply theme immediately to prevent flash
     const root = document.documentElement
-    if (theme === 'dark') {
+    if (initialTheme === 'dark') {
       root.classList.add('dark')
     } else {
       root.classList.remove('dark')
     }
-  }, [theme])
+    
+    return initialTheme
+  })
 
   useEffect(() => {
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e) => {
-      // Only update if user hasn't manually set a theme
-      if (!localStorage.getItem('billcheck-theme')) {
-        setTheme(e.matches ? 'dark' : 'light')
+    try {
+      // Save to localStorage
+      localStorage.setItem('billcheck-theme', theme)
+      
+      // Apply theme class to document
+      const root = document.documentElement
+      if (theme === 'dark') {
+        root.classList.add('dark')
+      } else {
+        root.classList.remove('dark')
       }
+    } catch (error) {
+      console.warn('Failed to save theme preference:', error)
     }
+  }, [theme])
 
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+useEffect(() => {
+    try {
+      // Listen for system theme changes
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const handleChange = (e) => {
+        // Only update if user hasn't manually set a theme
+        try {
+          const savedTheme = localStorage.getItem('billcheck-theme')
+          if (!savedTheme) {
+            setTheme(e.matches ? 'dark' : 'light')
+          }
+        } catch (error) {
+          console.warn('Failed to check saved theme:', error)
+        }
+      }
+      mediaQuery.addEventListener('change', handleChange)
+      return () => mediaQuery.removeEventListener('change', handleChange)
+    } catch (error) {
+      console.warn('Failed to setup theme media query listener:', error)
+    }
   }, [])
 
   const toggleTheme = () => {

@@ -37,40 +37,45 @@ class BillService {
 async getBillByConsumerId(consumerId) {
     await delay(DELAY_MS)
     
-    // Clean and validate the consumer ID
-    const cleanId = consumerId.toString().replace(/\D/g, '')
+    if (!consumerId) {
+      throw new Error("Consumer ID is required")
+    }
+    
+    // Clean and validate the consumer ID - ensure it's a string first
+    const cleanId = String(consumerId).replace(/\D/g, '')
+    
+    if (!cleanId || cleanId.length < 10 || cleanId.length > 12) {
+      throw new Error(`Invalid Consumer ID format. Expected 10-12 digits, got ${cleanId.length} digits.`)
+    }
     
     // Normalize the input consumer ID
     const normalizedInput = cleanId.replace(/[\s\-_]/g, '')
     
-    // Try exact match first (supporting 10-digit IDs)
+    // Try exact match first (supporting 10-12 digit IDs)
     let bill = billsData.find(bill => {
-      const normalizedBill = bill.consumerId.replace(/[\s\-_]/g, '')
-      return normalizedBill === normalizedInput || 
-             normalizedBill === consumerId.toString().replace(/[\s\-_]/g, '')
+      const normalizedBill = String(bill.consumerId).replace(/[\s\-_]/g, '').replace(/\D/g, '')
+      return normalizedBill === normalizedInput
     })
     
-    // If no exact match, try partial matches (for typos or incomplete IDs)
-    if (!bill) {
+    // If no exact match, try partial matches for longer IDs containing the input
+    if (!bill && normalizedInput.length >= 10) {
       bill = billsData.find(bill => {
-        const normalizedBill = bill.consumerId.replace(/[\s\-_]/g, '')
-        // Check if the input is contained within the bill ID (for partial matches)
-        return normalizedBill.includes(normalizedInput) || 
-               normalizedInput.includes(normalizedBill)
+        const normalizedBill = String(bill.consumerId).replace(/[\s\-_]/g, '').replace(/\D/g, '')
+        return normalizedBill.includes(normalizedInput) || normalizedInput.includes(normalizedBill)
       })
     }
     
     // If still no match, try fuzzy matching (allow 1-2 character differences)
-    if (!bill) {
+    if (!bill && normalizedInput.length >= 10) {
       bill = billsData.find(bill => {
-        const normalizedBill = bill.consumerId.replace(/[\s\-_]/g, '')
+        const normalizedBill = String(bill.consumerId).replace(/[\s\-_]/g, '').replace(/\D/g, '')
         return levenshteinDistance(normalizedBill, normalizedInput) <= 2 &&
                Math.abs(normalizedBill.length - normalizedInput.length) <= 1
       })
     }
     
     if (!bill) {
-throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's exactly 10-12 digits without spaces.")
+      throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's exactly 10-12 digits without spaces.")
     }
     
     return { ...bill }
@@ -104,51 +109,6 @@ throw new Error("Bill not found for the provided consumer ID. Please verify your
     return billsData.map(bill => ({ ...bill }))
   }
   
-async getBillHistory(consumerId, months = 12) {
-    await delay(800) // Simulate API delay
-    
-    if (!consumerId) {
-      throw new Error("Consumer ID is required")
-    }
-    
-    // Find all bills for the consumer
-    const consumerBills = billsData.filter(bill => 
-      bill.consumerId === consumerId
-    )
-    
-    if (consumerBills.length === 0) {
-      throw new Error("No bill history found for this consumer ID")
-    }
-    
-    // Generate historical bills for the last 'months' months
-    const currentDate = new Date()
-    const historicalBills = []
-    
-    for (let i = 0; i < months; i++) {
-      const billMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
-      
-      // Use existing bill data as template but adjust for different months
-      const templateBill = consumerBills[0]
-      const monthVariation = i * 0.1 // Small variation in consumption
-      
-      const historicalBill = {
-        ...templateBill,
-        billMonth: billMonth.toISOString(),
-        dueDate: new Date(billMonth.getFullYear(), billMonth.getMonth(), 25).toISOString(),
-        unitsConsumed: Math.max(50, Math.round((templateBill.unitsConsumed || 250) * (1 + (Math.random() - 0.5) * monthVariation))),
-        meterReading: (templateBill.meterReading || 1000) + i * 20,
-        billAmount: templateBill.billAmount * (1 + (Math.random() - 0.5) * 0.2),
-        totalAmount: templateBill.totalAmount * (1 + (Math.random() - 0.5) * 0.2),
-        status: i === 0 ? "unpaid" : (Math.random() > 0.8 ? "overdue" : "paid")
-      }
-      
-      historicalBills.push(historicalBill)
-    }
-    
-    // Sort by bill month (newest first)
-    return historicalBills.sort((a, b) => new Date(b.billMonth) - new Date(a.billMonth))
-  }
-
 async getBillHistory(searchValue, months = 12, searchType = "consumer") {
     await delay(800) // Simulate API delay
     
@@ -160,14 +120,18 @@ async getBillHistory(searchValue, months = 12, searchType = "consumer") {
     let consumerBills = []
     
     if (searchType === "consumer") {
-      consumerBills = billsData.filter(bill => 
-        bill.consumerId === searchValue
-      )
+      // Normalize the search value for consumer ID
+      const normalizedSearch = String(searchValue).replace(/[\s\-_]/g, '').replace(/\D/g, '')
+      
+      consumerBills = billsData.filter(bill => {
+        const normalizedBill = String(bill.consumerId).replace(/[\s\-_]/g, '').replace(/\D/g, '')
+        return normalizedBill === normalizedSearch
+      })
     } else if (searchType === "reference") {
       // Simulate reference number to consumer ID mapping
       consumerBills = billsData.filter(bill => {
-        const refPattern = `REF${bill.consumerId.slice(-8)}`.toUpperCase()
-        return refPattern === searchValue.toUpperCase()
+        const refPattern = `REF${String(bill.consumerId).slice(-8)}`.toUpperCase()
+        return refPattern === String(searchValue).toUpperCase()
       })
     }
     
@@ -203,6 +167,7 @@ async getBillHistory(searchValue, months = 12, searchType = "consumer") {
     // Sort by bill month (newest first)
     return historicalBills.sort((a, b) => new Date(b.billMonth) - new Date(a.billMonth))
   }
+
 
   async validateConsumerId(consumerId) {
     await delay(100)

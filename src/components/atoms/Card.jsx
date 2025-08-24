@@ -7,13 +7,13 @@ const Card = React.forwardRef(({
   className,
   ...props 
 }, ref) => {
-  const baseClasses = "rounded-2xl border transition-all duration-200"
+const baseClasses = "rounded-2xl border transition-all duration-200"
   
   const variants = {
-    default: "bg-white border-gray-100 shadow-card",
-    glass: "bg-white/80 backdrop-blur-sm border-white/20 shadow-soft",
-    outlined: "bg-white border-gray-200 shadow-none hover:shadow-card",
-    elevated: "bg-white border-gray-100 shadow-hover"
+    default: "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-card",
+    glass: "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/20 dark:border-gray-700/20 shadow-soft",
+    outlined: "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 shadow-none hover:shadow-card",
+    elevated: "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-hover"
   }
   
   return (
