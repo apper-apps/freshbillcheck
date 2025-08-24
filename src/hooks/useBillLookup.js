@@ -12,9 +12,11 @@ export const useBillLookup = () => {
   const [historyLoading, setHistoryLoading] = useState(false)
   const [historyError, setHistoryError] = useState("")
   
-const searchBill = useCallback(async (consumerId) => {
-    if (!consumerId) {
-      setError("Consumer ID is required")
+const searchBill = useCallback(async (searchValue, searchType = "consumer") => {
+    if (!searchValue) {
+      const fieldName = searchType === "consumer" ? "Consumer ID" : 
+                       searchType === "reference" ? "Reference Number" : "API Key"
+      setError(`${fieldName} is required`)
       return
     }
     
@@ -22,8 +24,17 @@ const searchBill = useCallback(async (consumerId) => {
     setError("")
     setBillData(null)
     
-try {
-      const bill = await billService.getBillByConsumerId(consumerId)
+    try {
+      let bill
+      
+      if (searchType === "consumer") {
+        bill = await billService.getBillByConsumerId(searchValue)
+      } else if (searchType === "reference") {
+        bill = await billService.getBillByReferenceNumber(searchValue)
+      } else if (searchType === "apikey") {
+        bill = await billService.getBillByApiKey(searchValue)
+      }
+      
       setBillData(bill)
       toast.success("Bill found successfully!", {
         position: "top-right",
@@ -34,24 +45,51 @@ try {
       
       // Provide more specific and helpful error messages
       if (errorMessage.includes("Bill not found")) {
-        errorMessage = `No bill found for Consumer ID: ${consumerId}
+        if (searchType === "consumer") {
+          errorMessage = `No bill found for Consumer ID: ${searchValue}
 
 Please check:
-• Consumer ID should be 10-12 digits
-• Remove spaces, dashes, or special characters
+• Consumer ID should be exactly 10, 11, or 12 digits
+• Remove spaces, dashes, or special characters  
 • Verify ID from your latest electricity bill
 • Try entering without any formatting
 
 If you have multiple connections, try a different Consumer ID.`
+        } else if (searchType === "reference") {
+          errorMessage = `No bill found for Reference Number: ${searchValue}
+
+Please check:
+• Reference number should be 8-16 alphanumeric characters
+• Remove spaces and special characters
+• Verify reference from your bill receipt
+• Try the reference number exactly as shown on your bill`
+        } else if (searchType === "apikey") {
+          errorMessage = `Invalid or expired API key
+
+Please check:
+• Contact your electricity provider for a valid API key
+• Ensure the API key hasn't expired
+• Common providers: WAPDA, LESCO, FESCO, GEPCO, IESCO, PESCO
+• API keys are usually provided for commercial accounts`
+        }
       } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
         errorMessage = "Connection failed. Please check your internet connection and try again."
       } else if (errorMessage.includes("Invalid format")) {
-        errorMessage = `Invalid Consumer ID format: ${consumerId}
+        if (searchType === "consumer") {
+          errorMessage = `Invalid Consumer ID format: ${searchValue}
 
 Required format:
-• Must be 10-12 digits only
+• Must be exactly 10, 11, or 12 digits only
 • No letters or special characters
-• Examples: 1234567890, 123456789012`
+• Examples: 1234567890, 12345678901, 123456789012`
+        } else if (searchType === "reference") {
+          errorMessage = `Invalid Reference Number format: ${searchValue}
+
+Required format:  
+• Must be 8-16 alphanumeric characters
+• Letters and numbers only
+• Examples: REF12345678, BIL987654321`
+        }
       } else if (errorMessage.includes("timeout")) {
         errorMessage = "Search timed out. Please try again or check your connection."
       }
@@ -76,9 +114,10 @@ Required format:
     searchBill(consumerId)
   }, [searchBill])
   
-const fetchBillHistory = useCallback(async (consumerId, months = 12) => {
-    if (!consumerId) {
-      setHistoryError("Consumer ID is required")
+const fetchBillHistory = useCallback(async (searchValue, searchType = "consumer", months = 12) => {
+    if (!searchValue) {
+      const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"
+      setHistoryError(`${fieldName} is required`)
       return
     }
     
@@ -87,7 +126,7 @@ const fetchBillHistory = useCallback(async (consumerId, months = 12) => {
     setBillHistory([])
     
     try {
-      const history = await billService.getBillHistory(consumerId, months)
+      const history = await billService.getBillHistory(searchValue, months, searchType)
       setBillHistory(history)
       toast.success(`Found ${history.length} historical bills`, {
         position: "top-right",
@@ -110,6 +149,22 @@ const fetchBillHistory = useCallback(async (consumerId, months = 12) => {
     setHistoryError("")
     setHistoryLoading(false)
   }, [])
+
+const resetSearch = useCallback(() => {
+    setBillData(null)
+    setError("")
+    setLoading(false)
+  }, [])
+
+  const resetHistory = useCallback(() => {
+    setBillHistory([])
+    setHistoryError("")
+    setHistoryLoading(false)
+  }, [])
+
+  const retrySearch = useCallback(async (searchValue, searchType) => {
+    await searchBill(searchValue, searchType)
+  }, [searchBill])
 
   return {
     billData,

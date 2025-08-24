@@ -28,14 +28,26 @@ export const formatConsumerId = (id) => {
 
 export const validateConsumerId = (id) => {
   if (!id || typeof id !== "string") return false
-  // Remove spaces and check if it's 10-12 digits
+  // Remove spaces and check if it's exactly 10, 11, or 12 digits (includes 10-digit support)
   const cleanId = id.replace(/\s/g, "")
-  return /^\d{10,12}$/.test(cleanId)
+  return /^\d{10}$/.test(cleanId) || /^\d{11}$/.test(cleanId) || /^\d{12}$/.test(cleanId)
+}
+
+export const validateReferenceNumber = (ref) => {
+  if (!ref || typeof ref !== "string") return false
+  // Reference numbers can be alphanumeric, 8-16 characters
+  const cleanRef = ref.replace(/\s/g, "")
+  return /^[A-Za-z0-9]{8,16}$/.test(cleanRef)
 }
 
 export const cleanConsumerId = (id) => {
   if (!id) return ""
   return id.replace(/\s/g, "").replace(/[^0-9]/g, "")
+}
+
+export const cleanReferenceNumber = (ref) => {
+  if (!ref) return ""
+  return ref.replace(/\s/g, "").replace(/[^A-Za-z0-9]/g, "")
 }
 
 export const getStatusColor = (status) => {

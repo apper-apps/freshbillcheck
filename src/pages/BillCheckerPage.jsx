@@ -1,21 +1,28 @@
-import React, { useState } from "react"
-import { motion } from "framer-motion"
-import { toast } from "react-toastify"
-import BillSearchForm from "@/components/organisms/BillSearchForm"
-import BillDisplay from "@/components/organisms/BillDisplay"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import { useBillLookup } from "@/hooks/useBillLookup"
-import BillHistoryTimeline from "@/components/organisms/BillHistoryTimeline"
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { useBillLookup } from "@/hooks/useBillLookup";
+import BillHistoryTimeline from "@/components/organisms/BillHistoryTimeline";
+import BillDisplay from "@/components/organisms/BillDisplay";
+import BillSearchForm from "@/components/organisms/BillSearchForm";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
 
 const BillCheckerPage = () => {
-  const [lastSearchedId, setLastSearchedId] = useState("")
+const [lastSearchedValue, setLastSearchedValue] = useState("")
+  const [lastSearchType, setLastSearchType] = useState("consumer")
   const { billData, loading, error, searchBill, resetSearch, retrySearch } = useBillLookup()
-  
-  const handleSearch = async (consumerId) => {
-    setLastSearchedId(consumerId)
-    await searchBill(consumerId)
+const handleSearch = async (searchValue, searchType = "consumer") => {
+    setLastSearchedValue(searchValue)
+    setLastSearchType(searchType)
+    await searchBill(searchValue, searchType)
+  }
+
+  const handleRetry = async () => {
+    if (lastSearchedValue) {
+      await retrySearch(lastSearchedValue, lastSearchType)
+    }
   }
   
   const handlePrint = () => {
@@ -52,13 +59,7 @@ Units Consumed: ${billData.unitsConsumed} kWh
       position: "top-right",
       autoClose: 3000
     })
-  }
-  
-  const handleRetry = () => {
-    if (lastSearchedId) {
-      retrySearch(lastSearchedId)
-    }
-  }
+}
   
 const renderContent = () => {
     if (loading) {
@@ -95,9 +96,9 @@ Please correct the format and try again.`
       
       return (
         <Error
-          message={error}
+message={error}
           suggestion={suggestion}
-          onRetry={lastSearchedId ? handleRetry : undefined}
+          onRetry={lastSearchedValue ? handleRetry : undefined}
           onReset={resetSearch}
         />
       )

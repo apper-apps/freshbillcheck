@@ -34,16 +34,16 @@ const levenshteinDistance = (str1, str2) => {
 }
 
 class BillService {
-  async getBillByConsumerId(consumerId) {
+async getBillByConsumerId(consumerId) {
     await delay(DELAY_MS)
     
     // Clean and validate the consumer ID
     const cleanId = consumerId.toString().replace(/\D/g, '')
     
-// Normalize the input consumer ID
+    // Normalize the input consumer ID
     const normalizedInput = cleanId.replace(/[\s\-_]/g, '')
     
-    // Try exact match first
+    // Try exact match first (supporting 10-digit IDs)
     let bill = billsData.find(bill => {
       const normalizedBill = bill.consumerId.replace(/[\s\-_]/g, '')
       return normalizedBill === normalizedInput || 
@@ -70,10 +70,65 @@ class BillService {
     }
     
     if (!bill) {
-      throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's 10-12 digits without spaces.")
+      throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's exactly 10, 11, or 12 digits without spaces.")
     }
     
     return { ...bill }
+  }
+
+  async getBillByReferenceNumber(referenceNumber) {
+    await delay(DELAY_MS)
+    
+    // Clean the reference number
+    const cleanRef = referenceNumber.toString().replace(/[\s\-_]/g, '').toUpperCase()
+    
+    // Try to find bill by reference number (simulate reference number search)
+    // For demo purposes, we'll try to match against a generated reference pattern
+    let bill = billsData.find(bill => {
+      // Generate a reference number pattern based on consumer ID
+      const refPattern = `REF${bill.consumerId.slice(-8)}`.toUpperCase()
+      return refPattern === cleanRef || 
+             bill.consumerId.includes(cleanRef.replace(/[A-Z]/g, ''))
+    })
+    
+    if (!bill) {
+      throw new Error("Bill not found for the provided reference number. Please verify your reference number and try again.")
+    }
+    
+    return { ...bill }
+  }
+
+  async getBillByApiKey(apiKey) {
+    await delay(DELAY_MS * 2) // Simulate API key validation delay
+    
+    if (!apiKey || apiKey.length < 10) {
+      throw new Error("Invalid API key format. Please provide a valid API key from your electricity provider.")
+    }
+    
+    // Simulate API key validation
+    const validApiKeyPatterns = [
+      /^WAPDA_[A-Z0-9]{20,}$/i,
+      /^LESCO_[A-Z0-9]{20,}$/i,
+      /^FESCO_[A-Z0-9]{20,}$/i,
+      /^GEPCO_[A-Z0-9]{20,}$/i,
+      /^IESCO_[A-Z0-9]{20,}$/i,
+      /^PESCO_[A-Z0-9]{20,}$/i,
+      /^TESCO_[A-Z0-9]{20,}$/i,
+      /^API_[A-Z0-9]{16,}$/i
+    ]
+    
+    const isValidPattern = validApiKeyPatterns.some(pattern => pattern.test(apiKey))
+    
+    if (!isValidPattern) {
+      throw new Error("Invalid API key format. Please use format: PROVIDER_XXXXXXXXXXXXX (e.g., LESCO_ABC123DEF456GHI789)")
+    }
+    
+    // For demo, return a sample bill
+    if (billsData.length > 0) {
+      return { ...billsData[0], searchedVia: 'api_key' }
+    }
+    
+    throw new Error("No bills available via API key search. Please contact your provider.")
   }
   
   async getAllBills() {
@@ -126,6 +181,61 @@ async getBillHistory(consumerId, months = 12) {
     return historicalBills.sort((a, b) => new Date(b.billMonth) - new Date(a.billMonth))
   }
 
+async getBillHistory(searchValue, months = 12, searchType = "consumer") {
+    await delay(800) // Simulate API delay
+    
+    if (!searchValue) {
+      throw new Error(`${searchType === "consumer" ? "Consumer ID" : "Reference Number"} is required`)
+    }
+    
+    // Find bills based on search type
+    let consumerBills = []
+    
+    if (searchType === "consumer") {
+      consumerBills = billsData.filter(bill => 
+        bill.consumerId === searchValue
+      )
+    } else if (searchType === "reference") {
+      // Simulate reference number to consumer ID mapping
+      consumerBills = billsData.filter(bill => {
+        const refPattern = `REF${bill.consumerId.slice(-8)}`.toUpperCase()
+        return refPattern === searchValue.toUpperCase()
+      })
+    }
+    
+    if (consumerBills.length === 0) {
+      throw new Error(`No bill history found for this ${searchType === "consumer" ? "consumer ID" : "reference number"}`)
+    }
+    
+    // Generate historical bills for the last 'months' months
+    const currentDate = new Date()
+    const historicalBills = []
+    
+    for (let i = 0; i < months; i++) {
+      const billMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+      
+      // Use existing bill data as template but adjust for different months
+      const templateBill = consumerBills[0]
+      const monthVariation = i * 0.1 // Small variation in consumption
+      
+      const historicalBill = {
+        ...templateBill,
+        billMonth: billMonth.toISOString(),
+        dueDate: new Date(billMonth.getFullYear(), billMonth.getMonth(), 25).toISOString(),
+        unitsConsumed: Math.max(50, Math.round((templateBill.unitsConsumed || 250) * (1 + (Math.random() - 0.5) * monthVariation))),
+        meterReading: (templateBill.meterReading || 1000) + i * 20,
+        billAmount: templateBill.billAmount * (1 + (Math.random() - 0.5) * 0.2),
+        totalAmount: templateBill.totalAmount * (1 + (Math.random() - 0.5) * 0.2),
+        status: i === 0 ? "unpaid" : (Math.random() > 0.8 ? "overdue" : "paid")
+      }
+      
+      historicalBills.push(historicalBill)
+    }
+    
+    // Sort by bill month (newest first)
+    return historicalBills.sort((a, b) => new Date(b.billMonth) - new Date(a.billMonth))
+  }
+
   async validateConsumerId(consumerId) {
     await delay(100)
     
@@ -135,10 +245,11 @@ async getBillHistory(consumerId, months = 12) {
     
     const cleaned = consumerId.replace(/\s/g, "")
     
-    if (!/^\d{10,12}$/.test(cleaned)) {
+    // Support exactly 10, 11, or 12 digits
+    if (!/^(\d{10}|\d{11}|\d{12})$/.test(cleaned)) {
       return { 
         valid: false, 
-        message: "Consumer ID must be 10-12 digits" 
+        message: "Consumer ID must be exactly 10, 11, or 12 digits" 
       }
     }
     
