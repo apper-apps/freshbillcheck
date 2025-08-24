@@ -22,8 +22,8 @@ export const formatDate = (date) => {
 
 export const formatConsumerId = (id) => {
   if (!id) return ""
-  // Format consumer ID with spaces for better readability
-  return id.toString().replace(/(.{4})/g, "$1 ").trim()
+  // Return consumer ID without space formatting
+  return id.toString()
 }
 
 export const validateConsumerId = (id) => {
