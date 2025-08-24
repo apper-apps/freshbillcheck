@@ -98,38 +98,6 @@ async getBillByConsumerId(consumerId) {
     return { ...bill }
   }
 
-  async getBillByApiKey(apiKey) {
-    await delay(DELAY_MS * 2) // Simulate API key validation delay
-    
-    if (!apiKey || apiKey.length < 10) {
-      throw new Error("Invalid API key format. Please provide a valid API key from your electricity provider.")
-    }
-    
-    // Simulate API key validation
-    const validApiKeyPatterns = [
-      /^WAPDA_[A-Z0-9]{20,}$/i,
-      /^LESCO_[A-Z0-9]{20,}$/i,
-      /^FESCO_[A-Z0-9]{20,}$/i,
-      /^GEPCO_[A-Z0-9]{20,}$/i,
-      /^IESCO_[A-Z0-9]{20,}$/i,
-      /^PESCO_[A-Z0-9]{20,}$/i,
-      /^TESCO_[A-Z0-9]{20,}$/i,
-      /^API_[A-Z0-9]{16,}$/i
-    ]
-    
-    const isValidPattern = validApiKeyPatterns.some(pattern => pattern.test(apiKey))
-    
-    if (!isValidPattern) {
-      throw new Error("Invalid API key format. Please use format: PROVIDER_XXXXXXXXXXXXX (e.g., LESCO_ABC123DEF456GHI789)")
-    }
-    
-    // For demo, return a sample bill
-    if (billsData.length > 0) {
-      return { ...billsData[0], searchedVia: 'api_key' }
-    }
-    
-    throw new Error("No bills available via API key search. Please contact your provider.")
-  }
   
   async getAllBills() {
     await delay(DELAY_MS)

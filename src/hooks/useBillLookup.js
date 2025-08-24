@@ -14,8 +14,7 @@ export const useBillLookup = () => {
   
 const searchBill = useCallback(async (searchValue, searchType = "consumer") => {
     if (!searchValue) {
-      const fieldName = searchType === "consumer" ? "Consumer ID" : 
-                       searchType === "reference" ? "Reference Number" : "API Key"
+const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"
       setError(`${fieldName} is required`)
       return
     }
@@ -31,9 +30,7 @@ const searchBill = useCallback(async (searchValue, searchType = "consumer") => {
         bill = await billService.getBillByConsumerId(searchValue)
       } else if (searchType === "reference") {
         bill = await billService.getBillByReferenceNumber(searchValue)
-      } else if (searchType === "apikey") {
-        bill = await billService.getBillByApiKey(searchValue)
-      }
+}
       
       setBillData(bill)
       toast.success("Bill found successfully!", {
@@ -63,15 +60,7 @@ Please check:
 • Remove spaces and special characters
 • Verify reference from your bill receipt
 • Try the reference number exactly as shown on your bill`
-        } else if (searchType === "apikey") {
-          errorMessage = `Invalid or expired API key
-
-Please check:
-• Contact your electricity provider for a valid API key
-• Ensure the API key hasn't expired
-• Common providers: WAPDA, LESCO, FESCO, GEPCO, IESCO, PESCO
-• API keys are usually provided for commercial accounts`
-        }
+}
       } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
         errorMessage = "Connection failed. Please check your internet connection and try again."
       } else if (errorMessage.includes("Invalid format")) {

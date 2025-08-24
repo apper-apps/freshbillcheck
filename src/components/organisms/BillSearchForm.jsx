@@ -7,10 +7,9 @@ import FormField from "@/components/molecules/FormField";
 import Button from "@/components/atoms/Button";
 
 const BillSearchForm = ({ onSearch, loading = false }) => {
-  const [searchType, setSearchType] = useState("consumer") // consumer, reference, apikey
+const [searchType, setSearchType] = useState("consumer") // consumer, reference
   const [consumerId, setConsumerId] = useState("")
   const [referenceNumber, setReferenceNumber] = useState("")
-const [apiKey, setApiKey] = useState("")
   const [error, setError] = useState("")
 
   const handleConsumerIdChange = (e) => {
@@ -49,11 +48,6 @@ const [apiKey, setApiKey] = useState("")
     }
   }
 
-  const handleApiKeyChange = (e) => {
-    const value = e.target.value
-    setApiKey(value)
-    setError("")
-  }
   
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -107,18 +101,7 @@ const [apiKey, setApiKey] = useState("")
       }
       
       onSearch(cleaned, "reference")
-    } else if (searchType === "apikey") {
-      if (!apiKey.trim()) {
-        setError("Please enter your API key to search")
-        toast.error("API key is required", { 
-          position: "top-right", 
-          autoClose: 3000 
-        })
-        return
-      }
-      
-      onSearch(apiKey.trim(), "apikey")
-    }
+}
   }
 
   const getTabClass = (type) => {
@@ -173,13 +156,6 @@ const [apiKey, setApiKey] = useState("")
           >
             Reference No.
           </button>
-          <button
-            type="button"
-            onClick={() => setSearchType("apikey")}
-            className={getTabClass("apikey")}
-          >
-            API Key
-          </button>
         </div>
         
         {/* Consumer ID Form */}
@@ -211,30 +187,6 @@ const [apiKey, setApiKey] = useState("")
         )}
 
         {/* API Key Form */}
-        {searchType === "apikey" && (
-          <div>
-            <FormField
-              label="API Key"
-              placeholder="Enter your API key"
-              value={apiKey}
-              onChange={handleApiKeyChange}
-              error={error}
-              required
-              inputClassName="text-center text-sm dark:bg-gray-800 dark:text-white dark:border-gray-600"
-              type="password"
-            />
-            <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                <ApperIcon name="Info" size={16} className="inline mr-1" />
-                Recommended API Key for Bill Checking:
-              </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 font-mono">
-                Use your electricity provider's API key or contact them for access.
-                Common providers: WAPDA, LESCO, FESCO, GEPCO, IESCO, PESCO, TESCO, SEPCO, HESCO, QESCO
-              </p>
-            </div>
-          </div>
-        )}
         
         <Button
           type="submit"
