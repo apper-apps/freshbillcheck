@@ -10,11 +10,10 @@ const BillSearchForm = ({ onSearch, loading = false }) => {
   const [searchType, setSearchType] = useState("consumer") // consumer, reference, apikey
   const [consumerId, setConsumerId] = useState("")
   const [referenceNumber, setReferenceNumber] = useState("")
-  const [apiKey, setApiKey] = useState("")
+const [apiKey, setApiKey] = useState("")
   const [error, setError] = useState("")
 
   const handleConsumerIdChange = (e) => {
-const handleConsumerIdChange = (e) => {
     const value = e.target.value
     const cleaned = cleanConsumerId(value)
     

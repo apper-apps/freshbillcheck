@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react"
-import billService from "@/services/api/billService"
-import { toast } from "react-toastify"
+import { useCallback, useState } from "react";
+import { toast } from "react-toastify";
+import billService from "@/services/api/billService";
 
 export const useBillLookup = () => {
   const [billData, setBillData] = useState(null)
@@ -144,27 +144,11 @@ const fetchBillHistory = useCallback(async (searchValue, searchType = "consumer"
     }
   }, [])
   
-  const resetHistory = useCallback(() => {
+const resetHistory = useCallback(() => {
     setBillHistory([])
     setHistoryError("")
     setHistoryLoading(false)
   }, [])
-
-const resetSearch = useCallback(() => {
-    setBillData(null)
-    setError("")
-    setLoading(false)
-  }, [])
-
-  const resetHistory = useCallback(() => {
-    setBillHistory([])
-    setHistoryError("")
-    setHistoryLoading(false)
-  }, [])
-
-  const retrySearch = useCallback(async (searchValue, searchType) => {
-    await searchBill(searchValue, searchType)
-  }, [searchBill])
 
   return {
     billData,
