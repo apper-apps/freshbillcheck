@@ -1,0 +1,121 @@
+@import 'react-toastify/dist/ReactToastify.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-electric-blue to-sky-blue bg-clip-text text-transparent;
+  }
+  
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-electric-blue to-sky-blue text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 ease-out;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-electric-blue border-2 border-electric-blue font-semibold py-3 px-6 rounded-xl hover:bg-electric-blue hover:text-white transform hover:scale-[1.02] transition-all duration-200 ease-out;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-electric-blue focus:ring-4 focus:ring-electric-blue/20 outline-none transition-all duration-200;
+  }
+  
+  .bill-card {
+    @apply bg-white rounded-2xl shadow-card p-6 border border-gray-100;
+  }
+  
+  .status-paid {
+    @apply bg-success/10 text-success border border-success/20 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+  
+  .status-unpaid {
+    @apply bg-warning/10 text-warning border border-warning/20 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+  
+  .status-overdue {
+    @apply bg-error/10 text-error border border-error/20 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+}
+
+/* Toast Overrides */
+.Toastify__toast-container {
+  z-index: 9999;
+  font-family: 'Inter', sans-serif;
+}
+
+.Toastify__toast {
+  border-radius: 12px;
+  font-size: 14px;
+  min-height: 60px;
+  padding: 16px;
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  color: white;
+}
+
+.Toastify__progress-bar {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Loading Animation */
+@keyframes lightning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.lightning-icon {
+  animation: lightning 1.5s ease-in-out infinite;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  .bill-card {
+    box-shadow: none;
+    border: 2px solid #e5e7eb;
+  }
+}
