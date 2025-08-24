@@ -29,7 +29,7 @@ const Error = ({
         
         <div className="space-y-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+<h3 className="text-xl font-bold text-gray-900 mb-2">
               Oops! Something went wrong
             </h3>
             <p className="text-gray-600 font-medium">
@@ -40,9 +40,17 @@ const Error = ({
           <div className="bg-error/5 border border-error/20 rounded-xl p-4">
             <div className="flex items-start gap-3">
               <ApperIcon name="Info" size={16} className="text-error mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-error font-medium text-left">
-                {suggestion}
-              </p>
+              <div className="text-sm text-error font-medium text-left">
+                {suggestion.includes('\n') ? (
+                  <div className="space-y-1">
+                    {suggestion.split('\n').map((line, index) => (
+                      <div key={index}>{line}</div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>{suggestion}</p>
+                )}
+              </div>
             </div>
           </div>
           

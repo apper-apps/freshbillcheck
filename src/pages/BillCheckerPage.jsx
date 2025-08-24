@@ -60,20 +60,26 @@ Units Consumed: ${billData.unitsConsumed} kWh
     }
   }
   
-  const renderContent = () => {
+const renderContent = () => {
     if (loading) {
       return <Loading message="Checking your bill..." />
     }
     
     if (error) {
+      let suggestion = "Please try again or contact support if the problem persists."
+      
+      if (error.includes("not found") || error.includes("Bill not found")) {
+        suggestion = "Double-check your consumer ID format:\n• Must be 10-12 digits only\n• Remove any spaces or special characters\n• Try a different consumer ID if you have multiple connections"
+      } else if (error.includes("network") || error.includes("connection") || error.includes("internet")) {
+        suggestion = "Please check your internet connection and try again."
+      } else if (error.includes("required")) {
+        suggestion = "Please enter your consumer ID to search for your bill."
+      }
+      
       return (
         <Error
           message={error}
-          suggestion={
-            error.includes("not found") 
-              ? "Please verify your consumer ID and try again. Make sure it's 10-12 digits without spaces."
-              : "Please check your internet connection and try again."
-          }
+          suggestion={suggestion}
           onRetry={lastSearchedId ? handleRetry : undefined}
           onReset={resetSearch}
         />

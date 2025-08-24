@@ -12,7 +12,7 @@ export const useBillLookup = () => {
   const [historyLoading, setHistoryLoading] = useState(false)
   const [historyError, setHistoryError] = useState("")
   
-  const searchBill = useCallback(async (consumerId) => {
+const searchBill = useCallback(async (consumerId) => {
     if (!consumerId) {
       setError("Consumer ID is required")
       return
@@ -30,9 +30,17 @@ export const useBillLookup = () => {
         autoClose: 2000
       })
     } catch (err) {
-      const errorMessage = err.message || "Failed to fetch bill information"
+      let errorMessage = err.message || "Failed to fetch bill information"
+      
+      // Provide more specific error messages
+      if (errorMessage.includes("Bill not found")) {
+        errorMessage = "Bill not found for consumer ID " + consumerId + ". Please verify your consumer ID and try again."
+      } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
+        errorMessage = "Unable to connect to the service. Please check your internet connection and try again."
+      }
+      
       setError(errorMessage)
-      toast.error(errorMessage, {
+      toast.error("Bill not found", {
         position: "top-right",
         autoClose: 4000
       })

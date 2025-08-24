@@ -8,12 +8,15 @@ class BillService {
   async getBillByConsumerId(consumerId) {
     await delay(DELAY_MS)
     
+    // Clean and validate the consumer ID
+    const cleanId = consumerId.toString().replace(/\D/g, '')
+    
     const bill = billsData.find(bill => 
-      bill.consumerId === consumerId.toString()
+      bill.consumerId === cleanId || bill.consumerId === consumerId.toString()
     )
     
     if (!bill) {
-      throw new Error("Bill not found for the provided consumer ID")
+      throw new Error("Bill not found for the provided consumer ID. Please verify your consumer ID and try again. Make sure it's 10-12 digits without spaces.")
     }
     
     return { ...bill }
