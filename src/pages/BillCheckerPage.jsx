@@ -7,6 +7,7 @@ import Loading from "@/components/ui/Loading"
 import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
 import { useBillLookup } from "@/hooks/useBillLookup"
+import BillHistoryTimeline from "@/components/organisms/BillHistoryTimeline"
 
 const BillCheckerPage = () => {
   const [lastSearchedId, setLastSearchedId] = useState("")
@@ -101,7 +102,7 @@ Units Consumed: ${billData.unitsConsumed} kWh
       className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50 py-8 px-4"
     >
       <div className="max-w-4xl mx-auto">
-        {renderContent()}
+{renderContent()}
       </div>
     </motion.div>
   )

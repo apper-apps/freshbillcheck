@@ -50,3 +50,33 @@ export const getStatusColor = (status) => {
       return "text-gray-600 bg-gray/10 border-gray/20"
   }
 }
+
+export const formatMonthYear = (date) => {
+  if (!date) return "N/A"
+  try {
+    const parsedDate = typeof date === "string" ? new Date(date) : date
+    return format(parsedDate, "MMM yyyy")
+  } catch (error) {
+    return "Invalid Date"
+  }
+}
+
+export const getMonthsRange = (count = 12) => {
+  const months = []
+  const currentDate = new Date()
+  
+  for (let i = 0; i < count; i++) {
+    const month = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+    months.push(month)
+  }
+  
+  return months
+}
+
+export const getMonthName = (monthIndex) => {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ]
+  return months[monthIndex] || "Unknown"
+}

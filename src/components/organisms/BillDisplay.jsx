@@ -7,7 +7,7 @@ import StatusBadge from "@/components/molecules/StatusBadge"
 import ApperIcon from "@/components/ApperIcon"
 import { formatDate, formatCurrency } from "@/utils/formatters"
 
-const BillDisplay = ({ billData, onPrint, onDownload, onNewSearch }) => {
+const BillDisplay = ({ billData, onPrint, onDownload, onNewSearch, onViewHistory }) => {
   const {
     consumerId,
     billAmount,
@@ -93,7 +93,7 @@ const BillDisplay = ({ billData, onPrint, onDownload, onNewSearch }) => {
         </div>
       </Card>
       
-      {/* Action Buttons */}
+{/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 no-print">
         <Button 
           variant="secondary" 
@@ -113,6 +113,16 @@ const BillDisplay = ({ billData, onPrint, onDownload, onNewSearch }) => {
         >
           <ApperIcon name="Download" size={20} />
           Download PDF
+        </Button>
+        
+        <Button 
+          variant="secondary" 
+          size="lg" 
+          onClick={onViewHistory}
+          className="flex-1 gap-2"
+        >
+          <ApperIcon name="Clock" size={20} />
+          View History
         </Button>
         
         <Button 

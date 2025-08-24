@@ -24,6 +24,51 @@ class BillService {
     return billsData.map(bill => ({ ...bill }))
   }
   
+async getBillHistory(consumerId, months = 12) {
+    await delay(800) // Simulate API delay
+    
+    if (!consumerId) {
+      throw new Error("Consumer ID is required")
+    }
+    
+    // Find all bills for the consumer
+    const consumerBills = billsData.filter(bill => 
+      bill.consumerId === consumerId
+    )
+    
+    if (consumerBills.length === 0) {
+      throw new Error("No bill history found for this consumer ID")
+    }
+    
+    // Generate historical bills for the last 'months' months
+    const currentDate = new Date()
+    const historicalBills = []
+    
+    for (let i = 0; i < months; i++) {
+      const billMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+      
+      // Use existing bill data as template but adjust for different months
+      const templateBill = consumerBills[0]
+      const monthVariation = i * 0.1 // Small variation in consumption
+      
+      const historicalBill = {
+        ...templateBill,
+        billMonth: billMonth.toISOString(),
+        dueDate: new Date(billMonth.getFullYear(), billMonth.getMonth(), 25).toISOString(),
+        unitsConsumed: Math.max(50, Math.round((templateBill.unitsConsumed || 250) * (1 + (Math.random() - 0.5) * monthVariation))),
+        meterReading: (templateBill.meterReading || 1000) + i * 20,
+        billAmount: templateBill.billAmount * (1 + (Math.random() - 0.5) * 0.2),
+        totalAmount: templateBill.totalAmount * (1 + (Math.random() - 0.5) * 0.2),
+        status: i === 0 ? "unpaid" : (Math.random() > 0.8 ? "overdue" : "paid")
+      }
+      
+      historicalBills.push(historicalBill)
+    }
+    
+    // Sort by bill month (newest first)
+    return historicalBills.sort((a, b) => new Date(b.billMonth) - new Date(a.billMonth))
+  }
+
   async validateConsumerId(consumerId) {
     await delay(100)
     
