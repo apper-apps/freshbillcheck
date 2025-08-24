@@ -20,11 +20,11 @@ const handleConsumerIdChange = (e) => {
     if (cleaned.length <= 12) {
       setConsumerId(formatConsumerId(cleaned))
       
-      // Real-time validation feedback - accept 10, 11, or 12 digits
-      if (cleaned.length > 0 && cleaned.length < 10) {
-        setError("Consumer ID should be at least 10 digits")
-      } else {
+      // Clear any existing errors when typing valid input
+      if (cleaned.length === 0 || (cleaned.length >= 10 && cleaned.length <= 12)) {
         setError("")
+      } else if (cleaned.length > 0 && cleaned.length < 10) {
+        setError("Consumer ID should be at least 10 digits")
       }
     }
   }
@@ -52,7 +52,7 @@ const handleConsumerIdChange = (e) => {
     setError("")
     
     if (searchType === "consumer") {
-      const cleaned = cleanConsumerId(consumerId)
+const cleaned = cleanConsumerId(consumerId)
       
       if (!cleaned) {
         setError("Please enter your consumer ID to search")
@@ -63,8 +63,9 @@ const handleConsumerIdChange = (e) => {
         return
       }
       
-      if (!validateConsumerId(cleaned)) {
-const errorMsg = cleaned.length < 10 
+      // Validate Consumer ID length (10-12 digits)
+      if (cleaned.length < 10 || cleaned.length > 12) {
+        const errorMsg = cleaned.length < 10 
           ? `Consumer ID too short (${cleaned.length} digits). Please enter exactly 10-12 digits.`
           : `Consumer ID too long (${cleaned.length} digits). Please enter exactly 10-12 digits.`
         setError(errorMsg)
@@ -101,11 +102,11 @@ const errorMsg = cleaned.length < 10
 }
   }
 
-  const getTabClass = (type) => {
+const getTabClass = (type) => {
     return `px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
       searchType === type
         ? 'bg-electric-blue text-white shadow-md'
-        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+        : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
     }`
   }
   
@@ -128,7 +129,7 @@ const errorMsg = cleaned.length < 10
           </motion.div>
           
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+<h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
               Check Your <span className="gradient-text">Electricity Bill</span>
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-lg">
@@ -138,7 +139,7 @@ const errorMsg = cleaned.length < 10
         </div>
 
         {/* Search Type Tabs */}
-        <div className="flex space-x-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+<div className="flex space-x-2 p-1 bg-gray-100 rounded-xl">
           <button
             type="button"
             onClick={() => setSearchType("consumer")}
@@ -164,7 +165,7 @@ const errorMsg = cleaned.length < 10
             onChange={handleConsumerIdChange}
             error={error}
             required
-            inputClassName="text-center text-xl tracking-wider dark:bg-gray-800 dark:text-white dark:border-gray-600"
+inputClassName="text-center text-xl tracking-wider"
             maxLength="14"
           />
         )}
@@ -178,7 +179,7 @@ const errorMsg = cleaned.length < 10
             onChange={handleReferenceChange}
             error={error}
             required
-            inputClassName="text-center text-xl tracking-wider dark:bg-gray-800 dark:text-white dark:border-gray-600"
+inputClassName="text-center text-xl tracking-wider"
             maxLength="16"
           />
         )}
@@ -204,7 +205,7 @@ const errorMsg = cleaned.length < 10
           )}
         </Button>
         
-        <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+<div className="text-center text-sm text-gray-500">
           <ApperIcon name="Shield" size={16} className="inline mr-1" />
           Your data is secure and not stored
         </div>

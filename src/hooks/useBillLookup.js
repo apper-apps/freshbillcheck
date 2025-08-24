@@ -14,7 +14,7 @@ export const useBillLookup = () => {
   
 const searchBill = useCallback(async (searchValue, searchType = "consumer") => {
     if (!searchValue) {
-const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"
+      const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"
       setError(`${fieldName} is required`)
       return
     }
@@ -30,7 +30,7 @@ const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"
         bill = await billService.getBillByConsumerId(searchValue)
       } else if (searchType === "reference") {
         bill = await billService.getBillByReferenceNumber(searchValue)
-}
+      }
       
       setBillData(bill)
       toast.success("Bill found successfully!", {
@@ -41,17 +41,18 @@ const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"
       let errorMessage = err.message || "Failed to fetch bill information"
       
       // Provide more specific and helpful error messages
-if (errorMessage.includes("Bill not found")) {
+      if (errorMessage.includes("Bill not found")) {
         if (searchType === "consumer") {
           errorMessage = `No bill found for Consumer ID: ${searchValue}
 
 Please verify:
 • Consumer ID must be exactly 10-12 digits long
-• Remove all spaces, dashes, or special characters  
+• Remove all spaces, dashes, or special characters
 • Check your latest electricity bill for the correct ID
-• Try entering the ID without any formatting
+• Try entering the ID exactly as shown on your bill
+• Contact your electricity provider if you're certain the ID is correct
 
-If you have multiple connections, try a different Consumer ID.`
+Valid examples: 1234567890, 12345678901, 123456789012`
         } else if (searchType === "reference") {
           errorMessage = `No bill found for Reference Number: ${searchValue}
 
@@ -60,11 +61,11 @@ Please check:
 • Remove spaces and special characters
 • Verify reference from your bill receipt
 • Try the reference number exactly as shown on your bill`
-}
+        }
       } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
         errorMessage = "Connection failed. Please check your internet connection and try again."
       } else if (errorMessage.includes("Invalid format")) {
-if (searchType === "consumer") {
+        if (searchType === "consumer") {
           errorMessage = `Invalid Consumer ID format: ${searchValue}
 
 Required format:
@@ -99,10 +100,9 @@ Required format:
     setLoading(false)
   }, [])
   
-const retrySearch = useCallback((searchValue, searchType = "consumer") => {
+  const retrySearch = useCallback((searchValue, searchType = "consumer") => {
     searchBill(searchValue, searchType)
   }, [searchBill])
-  
 const fetchBillHistory = useCallback(async (searchValue, searchType = "consumer", months = 12) => {
     if (!searchValue) {
       const fieldName = searchType === "consumer" ? "Consumer ID" : "Reference Number"

@@ -27,10 +27,11 @@ export const formatConsumerId = (id) => {
 }
 
 export const validateConsumerId = (id) => {
-  if (!id || typeof id !== "string") return false
-  // Remove spaces and check if it's exactly 10, 11, or 12 digits (includes 10-digit support)
-  const cleanId = id.replace(/\s/g, "")
-  return /^\d{10}$/.test(cleanId) || /^\d{11}$/.test(cleanId) || /^\d{12}$/.test(cleanId)
+  if (!id) return false
+  // Convert to string and remove all non-digits
+  const cleanId = String(id).replace(/\D/g, "")
+  // Check if it's exactly 10, 11, or 12 digits
+  return cleanId.length >= 10 && cleanId.length <= 12 && /^\d+$/.test(cleanId)
 }
 
 export const validateReferenceNumber = (ref) => {

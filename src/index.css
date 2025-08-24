@@ -17,13 +17,7 @@
     font-family: 'Inter', sans-serif;
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
-    @apply transition-colors duration-300;
-  }
-
-  /* Dark mode styles */
-  .dark {
-    color-scheme: dark;
-  }
+}
 }
 
 @layer components {
@@ -32,7 +26,7 @@
   }
   
   .glass-card {
-    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 transition-colors duration-300;
+@apply bg-white/80 backdrop-blur-sm border border-white/20;
   }
   
   .btn-primary {
@@ -40,41 +34,27 @@
   }
   
   .btn-secondary {
-    @apply bg-white dark:bg-gray-800 text-electric-blue dark:text-sky-blue border-2 border-electric-blue dark:border-sky-blue font-semibold py-3 px-6 rounded-xl hover:bg-electric-blue dark:hover:bg-sky-blue hover:text-white transform hover:scale-[1.02] transition-all duration-200 ease-out;
+@apply bg-white text-electric-blue border-2 border-electric-blue font-semibold py-3 px-6 rounded-xl hover:bg-electric-blue hover:text-white transform hover:scale-[1.02] transition-all duration-200 ease-out;
   }
   
   .input-field {
-    @apply w-full px-4 py-4 text-lg border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-xl focus:border-electric-blue focus:ring-4 focus:ring-electric-blue/20 outline-none transition-all duration-200;
+@apply w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-electric-blue focus:ring-4 focus:ring-electric-blue/20 outline-none transition-all duration-200;
   }
   
   .bill-card {
-    @apply bg-white dark:bg-gray-800 rounded-2xl shadow-card p-6 border border-gray-100 dark:border-gray-700 transition-colors duration-300;
+@apply bg-white rounded-2xl shadow-card p-6 border border-gray-100;
   }
   
   .status-paid {
-    @apply bg-success/10 dark:bg-success/20 text-success border border-success/20 px-3 py-1 rounded-full text-sm font-semibold;
+@apply bg-success/10 text-success border border-success/20 px-3 py-1 rounded-full text-sm font-semibold;
   }
   
   .status-unpaid {
-    @apply bg-warning/10 dark:bg-warning/20 text-warning border border-warning/20 px-3 py-1 rounded-full text-sm font-semibold;
+@apply bg-warning/10 text-warning border border-warning/20 px-3 py-1 rounded-full text-sm font-semibold;
   }
   
   .status-overdue {
-    @apply bg-error/10 dark:bg-error/20 text-error border border-error/20 px-3 py-1 rounded-full text-sm font-semibold;
-  }
-
-  /* Dark mode form elements */
-  .dark .input-field {
-    @apply bg-gray-800 border-gray-600 text-white placeholder-gray-400;
-  }
-
-  .dark .input-field:focus {
-    @apply border-sky-blue ring-sky-blue/20;
-  }
-
-  /* Theme transition for all elements */
-  * {
-    @apply transition-colors duration-300 ease-in-out;
+@apply bg-error/10 text-error border border-error/20 px-3 py-1 rounded-full text-sm font-semibold;
   }
 }
 
@@ -115,13 +95,6 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Dark mode toast overrides */
-.dark .Toastify__toast {
-  background: linear-gradient(135deg, #374151, #1f2937);
-  color: white;
-  border: 1px solid #4b5563;
-}
-
 /* Loading Animation */
 @keyframes lightning {
   0%, 100% { opacity: 1; }
@@ -131,17 +104,6 @@
 .lightning-icon {
   animation: lightning 1.5s ease-in-out infinite;
 }
-
-/* Theme toggle animation */
-@keyframes theme-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.theme-toggle {
-  animation: theme-rotate 0.5s ease-in-out;
-}
-
 /* Print Styles */
 @media print {
   .no-print {
@@ -162,26 +124,6 @@
     border: 2px solid #e5e7eb;
   }
 
-  /* Force light mode for printing */
-  .dark .bill-card {
-    background: white !important;
-    color: black !important;
-    border-color: #e5e7eb !important;
-  }
-
-  .dark .gradient-text {
-    color: #2563EB !important;
-    background: none !important;
-    -webkit-background-clip: initial !important;
-    background-clip: initial !important;
-  }
-}
-
-/* Responsive dark mode improvements */
-@media (max-width: 768px) {
-  .dark .bill-card {
-    @apply bg-gray-900/95;
-  }
 }
 
 /* Tab styling for search form */
@@ -191,26 +133,4 @@
 
 .search-tab.active {
   @apply transform scale-105;
-}
-
-/* Custom scrollbar for dark mode */
-.dark {
-  scrollbar-color: #4b5563 #1f2937;
-}
-
-.dark::-webkit-scrollbar {
-  width: 8px;
-}
-
-.dark::-webkit-scrollbar-track {
-  background: #1f2937;
-}
-
-.dark::-webkit-scrollbar-thumb {
-  background: #4b5563;
-  border-radius: 4px;
-}
-
-.dark::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
 }

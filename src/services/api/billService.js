@@ -44,33 +44,32 @@ async getBillByConsumerId(consumerId) {
     // Clean and validate the consumer ID - ensure it's a string first
     const cleanId = String(consumerId).replace(/\D/g, '')
     
+    // Validate length - must be exactly 10, 11, or 12 digits
     if (!cleanId || cleanId.length < 10 || cleanId.length > 12) {
       throw new Error(`Invalid Consumer ID format. Expected 10-12 digits, got ${cleanId.length} digits.`)
     }
     
-    // Normalize the input consumer ID
-    const normalizedInput = cleanId.replace(/[\s\-_]/g, '')
-    
-    // Try exact match first (supporting 10-12 digit IDs)
+    // Try exact match first
     let bill = billsData.find(bill => {
-      const normalizedBill = String(bill.consumerId).replace(/[\s\-_]/g, '').replace(/\D/g, '')
-      return normalizedBill === normalizedInput
+      const normalizedBill = String(bill.consumerId).replace(/\D/g, '')
+      return normalizedBill === cleanId
     })
     
-    // If no exact match, try partial matches for longer IDs containing the input
-    if (!bill && normalizedInput.length >= 10) {
+    // If no exact match found, try partial matching for flexibility
+    if (!bill) {
       bill = billsData.find(bill => {
-        const normalizedBill = String(bill.consumerId).replace(/[\s\-_]/g, '').replace(/\D/g, '')
-        return normalizedBill.includes(normalizedInput) || normalizedInput.includes(normalizedBill)
+        const normalizedBill = String(bill.consumerId).replace(/\D/g, '')
+        // Allow matching if either ID contains the other (for cases where stored ID might have extra digits)
+        return normalizedBill.includes(cleanId) || cleanId.includes(normalizedBill)
       })
     }
     
-    // If still no match, try fuzzy matching (allow 1-2 character differences)
-    if (!bill && normalizedInput.length >= 10) {
+    // If still no match, try fuzzy matching (allow small differences)
+    if (!bill) {
       bill = billsData.find(bill => {
-        const normalizedBill = String(bill.consumerId).replace(/[\s\-_]/g, '').replace(/\D/g, '')
-        return levenshteinDistance(normalizedBill, normalizedInput) <= 2 &&
-               Math.abs(normalizedBill.length - normalizedInput.length) <= 1
+        const normalizedBill = String(bill.consumerId).replace(/\D/g, '')
+        return levenshteinDistance(normalizedBill, cleanId) <= 2 &&
+               Math.abs(normalizedBill.length - cleanId.length) <= 1
       })
     }
     
