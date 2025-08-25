@@ -101,10 +101,10 @@ message={error}
           onRetry={lastSearchedValue ? handleRetry : undefined}
           onReset={resetSearch}
         />
-      )
+)
     }
-}
     
+    // Enhanced bill data validation and display logic
     // Enhanced bill data validation and display logic
     if (billData && typeof billData === 'object') {
       console.log("Rendering bill display with data:", billData)
@@ -136,19 +136,20 @@ message={error}
           }}
         />
       )
-    }
+}
     
     return <BillSearchForm onSearch={handleSearch} />
-  
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50 py-8 px-4"
+      className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50 py-8 px-4"
     >
       <div className="max-w-4xl mx-auto">
-{renderContent()}
+        {renderContent()}
       </div>
     </motion.div>
   )
