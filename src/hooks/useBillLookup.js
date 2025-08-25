@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
+import Error from "@/components/ui/Error";
 import billService from "@/services/api/billService";
 
 export const useBillLookup = () => {
@@ -23,7 +24,7 @@ const searchBill = useCallback(async (searchValue, searchType = "consumer") => {
     setError("")
     setBillData(null)
     
-    try {
+try {
       let bill
       
       if (searchType === "consumer") {
@@ -32,11 +33,29 @@ const searchBill = useCallback(async (searchValue, searchType = "consumer") => {
         bill = await billService.getBillByReferenceNumber(searchValue)
       }
       
+      // Ensure bill data is valid and complete
+      if (!bill) {
+        throw new Error("No bill data received from service")
+      }
+      
+      // Validate essential bill fields
+      const requiredFields = ['consumerId', 'billAmount', 'dueDate', 'status']
+      const missingFields = requiredFields.filter(field => !bill[field])
+      
+      if (missingFields.length > 0) {
+        console.warn(`Bill found but missing fields: ${missingFields.join(', ')}`)
+      }
+      
+      // Set bill data first to trigger immediate UI update
       setBillData(bill)
-      toast.success("Bill found successfully!", {
-        position: "top-right",
-        autoClose: 2000
-      })
+      
+      // Show success toast after bill data is set
+      setTimeout(() => {
+        toast.success("Bill found successfully! Preview is now available.", {
+          position: "top-right",
+          autoClose: 3000
+        })
+      }, 100)
     } catch (err) {
       let errorMessage = err.message || "Failed to fetch bill information"
       

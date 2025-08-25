@@ -103,20 +103,42 @@ message={error}
         />
       )
     }
+}
     
-    if (billData) {
+    // Enhanced bill data validation and display logic
+    if (billData && typeof billData === 'object') {
+      console.log("Rendering bill display with data:", billData)
+      
+      // Validate that we have essential bill information
+      if (!billData.consumerId && !billData.billAmount) {
+        console.warn("Bill data missing essential fields:", billData)
+        return (
+          <Error
+            message="Bill data is incomplete"
+            suggestion="The bill was found but some information is missing. Please try searching again or contact support."
+            onRetry={lastSearchedValue ? handleRetry : undefined}
+            onReset={resetSearch}
+          />
+        )
+      }
+      
       return (
         <BillDisplay
           billData={billData}
           onPrint={handlePrint}
           onDownload={handleDownload}
           onNewSearch={resetSearch}
+          onViewHistory={() => {
+            toast.info("Bill history feature coming soon!", {
+              position: "top-right",
+              autoClose: 2000
+            })
+          }}
         />
       )
     }
     
     return <BillSearchForm onSearch={handleSearch} />
-  }
   
   return (
     <motion.div
