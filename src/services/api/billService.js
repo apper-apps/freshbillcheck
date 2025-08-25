@@ -34,6 +34,131 @@ const levenshteinDistance = (str1, str2) => {
 }
 
 class BillService {
+  // Real GEPCO API call
+  async getRealBillByReference(referenceNumber) {
+    if (!referenceNumber) {
+      throw new Error("Reference number is required")
+    }
+
+    const cleanRef = String(referenceNumber).replace(/[\s\-_]/g, '')
+    
+    if (cleanRef.length < 10 || cleanRef.length > 16) {
+      throw new Error("Invalid reference number format. Must be 10-16 characters.")
+    }
+
+    try {
+      const response = await fetch(`https://bill.pitc.com.pk/gbill.aspx?refno=${cleanRef}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36'
+        },
+        body: '',
+        mode: 'cors'
+      })
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`)
+      }
+
+      const htmlContent = await response.text()
+      
+      // Parse the HTML response to extract bill data
+      const billData = this.parseGEPCOResponse(htmlContent, referenceNumber)
+      
+      return billData
+    } catch (error) {
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error("Unable to connect to GEPCO servers. Please check your internet connection and try again.")
+      }
+      
+      if (error.message.includes('CORS')) {
+        throw new Error("API access blocked by browser security. Please try using a different browser or contact support.")
+      }
+      
+      throw new Error(`Failed to fetch bill: ${error.message}`)
+    }
+  }
+
+  // Parse GEPCO HTML response
+  parseGEPCOResponse(htmlContent, referenceNumber) {
+    try {
+      // Create a temporary DOM parser
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(htmlContent, 'text/html')
+      
+      // Check for error messages
+      const errorElement = doc.querySelector('.error, .alert-danger, [class*="error"]')
+      if (errorElement && errorElement.textContent.toLowerCase().includes('not found')) {
+        throw new Error(`Bill not found for reference number: ${referenceNumber}. Please verify the reference number.`)
+      }
+      
+      // Extract bill information from common HTML patterns
+      const billData = {
+        consumerId: this.extractTextByLabel(doc, ['Consumer ID', 'Consumer No', 'Account No']),
+        consumerName: this.extractTextByLabel(doc, ['Consumer Name', 'Customer Name', 'Name']),
+        billMonth: this.extractTextByLabel(doc, ['Bill Month', 'Billing Month', 'Month']),
+        dueDate: this.extractTextByLabel(doc, ['Due Date', 'Last Date']),
+        billAmount: this.extractAmountByLabel(doc, ['Current Charges', 'Bill Amount', 'Amount']),
+        totalAmount: this.extractAmountByLabel(doc, ['Total Amount', 'Net Amount', 'Payable']),
+        unitsConsumed: this.extractNumberByLabel(doc, ['Units', 'kWh', 'Consumption']),
+        meterReading: this.extractNumberByLabel(doc, ['Meter Reading', 'Present Reading']),
+        status: 'unpaid', // Default status
+        referenceNumber: referenceNumber,
+        provider: 'GEPCO',
+        source: 'real_api'
+      }
+      
+      // Validate that we got essential data
+      if (!billData.consumerId && !billData.consumerName && !billData.billAmount) {
+        throw new Error("Unable to parse bill information from response. The bill data format may have changed.")
+      }
+      
+      return billData
+    } catch (error) {
+      throw new Error(`Failed to parse bill data: ${error.message}`)
+    }
+  }
+
+  // Helper method to extract text by label
+  extractTextByLabel(doc, labels) {
+    for (const label of labels) {
+      const element = doc.querySelector(`td:contains("${label}"), th:contains("${label}"), label:contains("${label}")`)
+      if (element) {
+        const nextCell = element.nextElementSibling || element.parentElement?.nextElementSibling
+        if (nextCell) {
+          return nextCell.textContent.trim()
+        }
+      }
+    }
+    return null
+  }
+
+  // Helper method to extract amount by label
+  extractAmountByLabel(doc, labels) {
+    for (const label of labels) {
+      const text = this.extractTextByLabel(doc, [label])
+      if (text) {
+        const amount = parseFloat(text.replace(/[^\d.]/g, ''))
+        if (!isNaN(amount)) return amount
+      }
+    }
+    return 0
+  }
+
+  // Helper method to extract number by label
+  extractNumberByLabel(doc, labels) {
+    for (const label of labels) {
+      const text = this.extractTextByLabel(doc, [label])
+      if (text) {
+        const number = parseInt(text.replace(/[^\d]/g, ''))
+        if (!isNaN(number)) return number
+      }
+    }
+    return 0
+  }
+
 async getBillByConsumerId(consumerId) {
     await delay(DELAY_MS)
     

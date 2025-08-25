@@ -41,6 +41,13 @@ export const validateReferenceNumber = (ref) => {
   return /^[A-Za-z0-9]{8,16}$/.test(cleanRef)
 }
 
+export const validateGEPCOReferenceNumber = (ref) => {
+  if (!ref || typeof ref !== "string") return false
+  // GEPCO reference numbers are typically 10-16 digits
+  const cleanRef = ref.replace(/\s/g, "")
+  return /^[0-9]{10,16}$/.test(cleanRef)
+}
+
 export const cleanConsumerId = (id) => {
   if (!id) return ""
   return id.replace(/\s/g, "").replace(/[^0-9]/g, "")

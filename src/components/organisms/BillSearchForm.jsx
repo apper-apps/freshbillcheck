@@ -7,11 +7,12 @@ import FormField from "@/components/molecules/FormField";
 import Button from "@/components/atoms/Button";
 
 const BillSearchForm = ({ onSearch, loading = false }) => {
-const [searchType, setSearchType] = useState("consumer") // consumer, reference
+const [searchType, setSearchType] = useState("consumer") // consumer, reference, real_api
   const [consumerId, setConsumerId] = useState("")
   const [referenceNumber, setReferenceNumber] = useState("")
+  const [realApiRef, setRealApiRef] = useState("")
   const [error, setError] = useState("")
-
+  const [useRealAPI, setUseRealAPI] = useState(false)
 const handleConsumerIdChange = (e) => {
     const value = e.target.value
     const cleaned = cleanConsumerId(value)
@@ -46,10 +47,54 @@ const handleConsumerIdChange = (e) => {
     }
   }
 
+const handleRealApiRefChange = (e) => {
+    const value = e.target.value
+    // Allow digits only for GEPCO reference numbers
+    const cleaned = value.replace(/[^\d]/g, '')
+    
+    if (cleaned.length <= 16) {
+      setRealApiRef(cleaned)
+      
+      if (cleaned.length > 0 && cleaned.length < 10) {
+        setError("GEPCO reference number should be at least 10 digits")
+      } else if (cleaned.length > 16) {
+        setError("GEPCO reference number cannot exceed 16 digits")
+      } else {
+        setError("")
+      }
+    }
+  }
   
   const handleSubmit = (e) => {
     e.preventDefault()
     setError("")
+    
+    if (useRealAPI) {
+      // Real GEPCO API call
+      if (!realApiRef) {
+        setError("Please enter your GEPCO reference number")
+        toast.error("GEPCO reference number is required", { 
+          position: "top-right", 
+          autoClose: 3000 
+        })
+        return
+      }
+      
+      if (realApiRef.length < 10 || realApiRef.length > 16) {
+        const errorMsg = realApiRef.length < 10 
+          ? `Reference number too short (${realApiRef.length} digits). Please enter 10-16 digits.`
+          : `Reference number too long (${realApiRef.length} digits). Please enter 10-16 digits.`
+        setError(errorMsg)
+        toast.error("Invalid GEPCO reference format", { 
+          position: "top-right", 
+          autoClose: 3000 
+        })
+        return
+      }
+      
+      onSearch(realApiRef, "real_api")
+      return
+    }
     
     if (searchType === "consumer") {
 const cleaned = cleanConsumerId(consumerId)
@@ -138,23 +183,56 @@ const getTabClass = (type) => {
           </div>
         </div>
 
-        {/* Search Type Tabs */}
-<div className="flex space-x-2 p-1 bg-gray-100 rounded-xl">
-          <button
-            type="button"
-            onClick={() => setSearchType("consumer")}
-            className={getTabClass("consumer")}
-          >
-            Consumer ID
-          </button>
-          <button
-            type="button"
-            onClick={() => setSearchType("reference")}
-            className={getTabClass("reference")}
-          >
-            Reference No.
-          </button>
+{/* API Type Toggle */}
+        <div className="flex items-center justify-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-sky-50 rounded-xl border border-blue-200">
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={useRealAPI}
+              onChange={(e) => {
+                setUseRealAPI(e.target.checked)
+                setError("")
+              }}
+              className="sr-only"
+            />
+            <div className={`w-12 h-6 rounded-full transition-colors duration-200 ${
+              useRealAPI ? 'bg-electric-blue' : 'bg-gray-300'
+            }`}>
+              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 mt-0.5 ${
+                useRealAPI ? 'translate-x-6' : 'translate-x-0.5'
+              }`} />
+            </div>
+            <span className="ml-3 text-sm font-medium text-gray-700">
+              {useRealAPI ? 'Live GEPCO API' : 'Demo Mode'}
+            </span>
+          </label>
+          <div className="flex items-center text-sm text-gray-600">
+            <ApperIcon name={useRealAPI ? "Wifi" : "Database"} size={16} className="mr-1" />
+            {useRealAPI ? 'Real-time data' : 'Sample data'}
+          </div>
         </div>
+
+        {!useRealAPI && (
+          <>
+            {/* Search Type Tabs */}
+            <div className="flex space-x-2 p-1 bg-gray-100 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setSearchType("consumer")}
+                className={getTabClass("consumer")}
+              >
+                Consumer ID
+              </button>
+              <button
+                type="button"
+                onClick={() => setSearchType("reference")}
+                className={getTabClass("reference")}
+              >
+                Reference No.
+              </button>
+            </div>
+          </>
+        )}
         
         {/* Consumer ID Form */}
         {searchType === "consumer" && (
@@ -182,6 +260,32 @@ inputClassName="text-center text-xl tracking-wider"
 inputClassName="text-center text-xl tracking-wider"
             maxLength="16"
           />
+)}
+
+        {/* Real API Form */}
+        {useRealAPI && (
+          <div className="space-y-4">
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center text-sm text-blue-800 mb-2">
+                <ApperIcon name="Info" size={16} className="mr-2" />
+                <span className="font-medium">GEPCO Live API</span>
+              </div>
+              <p className="text-xs text-blue-700">
+                This will fetch real bill data from GEPCO servers using your reference number.
+              </p>
+            </div>
+            
+            <FormField
+              label="GEPCO Reference Number"
+              placeholder="Enter your 10-16 digit reference number"
+              value={realApiRef}
+              onChange={handleRealApiRefChange}
+              error={error}
+              required
+              inputClassName="text-center text-xl tracking-wider font-mono"
+              maxLength="16"
+            />
+          </div>
         )}
 
         {/* API Key Form */}
